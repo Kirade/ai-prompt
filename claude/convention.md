@@ -10,19 +10,6 @@ This document outlines the coding standards and conventions to follow when worki
 - Keep functions and methods focused on a single responsibility
 - Prefer clarity over cleverness
 
-### Naming Conventions
-
-#### Variables and Functions
-- Use descriptive names that clearly indicate purpose
-- Variables: `camelCase` for JavaScript/TypeScript, `snake_case` for Python
-- Functions: Verb-based names (e.g., `getUserData`, `calculate_total`)
-- Constants: `UPPER_SNAKE_CASE`
-
-#### Classes and Components
-- Classes: `PascalCase`
-- React Components: `PascalCase`
-- Interfaces/Types: `PascalCase` with `I` or `T` prefix when appropriate
-
 ### File Organization
 - Keep files focused and modular
 - Group related functionality together
@@ -30,23 +17,11 @@ This document outlines the coding standards and conventions to follow when worki
 
 ## Language-Specific Guidelines
 
-### JavaScript/TypeScript
-- Always use `const` or `let`, never `var`
-- Prefer arrow functions for callbacks
-- Use async/await over Promise chains
-- Include proper TypeScript types for all parameters and return values
-
 ### Python
 - Follow PEP 8 style guide
 - Use type hints for function signatures
 - Prefer f-strings for string formatting
 - Use list comprehensions where appropriate
-
-### React
-- Use functional components with hooks
-- Keep components small and focused
-- Extract custom hooks for reusable logic
-- Use proper prop types or TypeScript interfaces
 
 ## Error Handling
 - Always handle errors appropriately
@@ -58,7 +33,6 @@ This document outlines the coding standards and conventions to follow when worki
 - Write self-documenting code
 - Add comments only when necessary to explain "why", not "what"
 - Keep comments up-to-date with code changes
-- Use JSDoc or similar documentation formats
 
 ## Testing
 - Write tests for critical functionality
