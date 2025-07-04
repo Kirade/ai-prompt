@@ -132,11 +132,12 @@ fi
 
 print_info "Applying AI prompts to: $TARGET_PATH"
 
-# Create .claude directory if it doesn't exist
+# Create .claude/ai-prompt directory if it doesn't exist
 CLAUDE_DIR="$TARGET_PATH/.claude"
-if [ ! -d "$CLAUDE_DIR" ]; then
-    print_info "Creating .claude directory..."
-    mkdir -p "$CLAUDE_DIR"
+AI_PROMPT_DIR="$CLAUDE_DIR/ai-prompt"
+if [ ! -d "$AI_PROMPT_DIR" ]; then
+    print_info "Creating .claude/ai-prompt directory..."
+    mkdir -p "$AI_PROMPT_DIR"
 fi
 
 # Function to backup a file
@@ -147,11 +148,51 @@ backup_file() {
     print_info "Backed up: $file -> $backup_file"
 }
 
+# Function to update .gitignore
+update_gitignore() {
+    local pattern="$1"
+    local gitignore="$TARGET_PATH/.gitignore"
+    
+    # Check if we're in a git repository
+    if [ ! -d "$TARGET_PATH/.git" ]; then
+        return
+    fi
+    
+    # Create .gitignore if it doesn't exist
+    if [ ! -f "$gitignore" ]; then
+        print_info "Creating .gitignore..."
+        touch "$gitignore"
+    fi
+    
+    # Check if pattern already exists
+    if ! grep -qxF "$pattern" "$gitignore" 2>/dev/null; then
+        print_info "Adding $pattern to .gitignore..."
+        echo "$pattern" >> "$gitignore"
+    fi
+}
+
+# Function to update paths in CLAUDE.md
+update_claude_paths() {
+    local file="$1"
+    local temp_file="${file}.tmp"
+    
+    # Update paths to point to .claude/ai-prompt/
+    sed 's|\(\[[^]]*\]\)(\./\([^)]*\.md\))|\1(./.claude/ai-prompt/\2)|g' "$file" > "$temp_file"
+    mv "$temp_file" "$file"
+    print_info "Updated paths in CLAUDE.md to reference .claude/ai-prompt/"
+}
+
 # Function to apply a prompt file
 apply_file() {
     local source_file="$1"
     local target_file="$2"
     local filename=$(basename "$source_file")
+    local is_claude_file=false
+    
+    # Check if this is CLAUDE.md or CLAUDE.local.md
+    if [[ "$filename" == "CLAUDE.md" ]] || [[ "$filename" == "CLAUDE.local.md" ]]; then
+        is_claude_file=true
+    fi
     
     # Check if target file already exists
     if [ -f "$target_file" ]; then
@@ -161,7 +202,7 @@ apply_file() {
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                 print_info "Skipping: $filename"
-                return
+                return 1
             fi
         fi
         
@@ -178,9 +219,15 @@ apply_file() {
     else
         print_info "Copying: $filename"
         cp "$source_file" "$target_file"
+        
+        # If it's CLAUDE.md, update the paths
+        if [ "$is_claude_file" = true ]; then
+            update_claude_paths "$target_file"
+        fi
     fi
     
     print_success "Applied: $filename"
+    return 0
 }
 
 # Apply all prompt files
@@ -191,12 +238,23 @@ for file in "$SOURCE_DIR"/*.md; do
     if [ -f "$file" ]; then
         filename=$(basename "$file")
         
-        # Handle local mode - rename CLAUDE.md to CLAUDE.local.md
-        if [ "$LOCAL_MODE" = true ] && [ "$filename" = "CLAUDE.md" ]; then
-            target_file="$CLAUDE_DIR/CLAUDE.local.md"
-            print_info "Installing CLAUDE.md as CLAUDE.local.md for project-specific settings"
+        # Determine target location based on filename
+        if [ "$filename" = "CLAUDE.md" ]; then
+            # Handle local mode - rename CLAUDE.md to CLAUDE.local.md
+            if [ "$LOCAL_MODE" = true ]; then
+                target_file="$TARGET_PATH/CLAUDE.local.md"
+                print_info "Installing CLAUDE.md as CLAUDE.local.md for project-specific settings"
+                
+                # Add CLAUDE.local.md and .claude/ai-prompt/ to .gitignore
+                update_gitignore "CLAUDE.local.md"
+                update_gitignore ".claude/ai-prompt/"
+            else
+                # Install CLAUDE.md in project root
+                target_file="$TARGET_PATH/CLAUDE.md"
+            fi
         else
-            target_file="$CLAUDE_DIR/$filename"
+            # All other files go to .claude/ai-prompt/
+            target_file="$AI_PROMPT_DIR/$filename"
         fi
         
         if apply_file "$file" "$target_file"; then
@@ -220,17 +278,21 @@ echo
 if [ "$GLOBAL" = true ]; then
     print_info "To use these global prompts with Claude Code:"
     print_info "1. Open any project in Claude Code"
-    print_info "2. The prompts in ~/.claude/ will be available globally"
-    print_info "3. Project-specific prompts in .claude/ will override global ones"
+    print_info "2. Global CLAUDE.md is in your home directory"
+    print_info "3. Supporting files are in ~/.claude/ai-prompt/"
+    print_info "4. Project-specific prompts will override global ones"
 else
     print_info "To use these prompts with Claude Code:"
     print_info "1. Open your project in Claude Code"
-    print_info "2. The prompts in .claude/ will be automatically loaded"
-    print_info "3. Reference them using @claude/CLAUDE.md"
+    print_info "2. CLAUDE.md will be loaded from the project root"
+    print_info "3. Supporting files are in .claude/ai-prompt/"
     
     # Check if this is a git repository and remind about .gitignore
     if [ -d "$TARGET_PATH/.git" ]; then
         echo
         print_info "Don't forget to add .claude/settings.local.json to your .gitignore!"
+        if [ "$LOCAL_MODE" = true ]; then
+            print_info "CLAUDE.local.md and .claude/ai-prompt/ have been automatically added to .gitignore"
+        fi
     fi
 fi
