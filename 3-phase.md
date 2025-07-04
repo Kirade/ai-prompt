@@ -90,9 +90,3 @@ Always structure your response as:
 1. **Phase 1 Results**: [Codebase analysis findings]
 2. **Phase 2 Plan**: [Implementation roadmap]
 3. **Phase 3 Implementation**: [Actual code with validation]
-
----
-
-## Additional Guidelines
-- **Code Conventions**: See [convention.md](./convention.md) for detailed coding standards and style guidelines
-
