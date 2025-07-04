@@ -41,6 +41,18 @@ This document outlines the coding standards and conventions to follow when worki
 - Use descriptive test names
 
 ## Version Control
+
+### Branch Strategy
+- Always create a new branch from the latest master/main branch
+- Use descriptive branch names that clearly indicate the work being done
+- Branch naming examples:
+  - feature/add-user-authentication
+  - fix/login-validation-error  
+  - refactor/optimize-database-queries
+  - docs/update-api-documentation
+
+### Commit Guidelines
+- Make commits at each logical step of work
 - Write clear, concise commit messages
 - Use conventional commit format when applicable
 - Keep commits atomic and focused
