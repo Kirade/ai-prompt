@@ -9,15 +9,26 @@ ai-prompt/
 ├── claude/
 │   ├── CLAUDE.md      # Claude Code용 기본 프롬프트
 │   └── convention.md  # 코드 컨벤션 가이드라인
+├── apply-prompts.sh   # 프롬프트 설치 스크립트
 └── README.md
+```
+
+### 설치 후 프로젝트 구조
+
+```
+your-project/
+├── CLAUDE.md          # 프로젝트 루트에 설치됨
+└── .claude/
+    └── ai-prompt/     # 보조 파일들
+        └── convention.md
 ```
 
 ## 사용 방법
 
 ### Claude Code
 
-1. Claude Code에서 프로젝트를 열 때, `@claude/CLAUDE.md` 파일이 자동으로 읽혀집니다.
-2. CLAUDE.md 파일은 다른 마크다운 파일들을 참조하여 모듈화된 프롬프트 관리가 가능합니다.
+1. 프로젝트 루트의 `CLAUDE.md` 파일이 자동으로 읽혀집니다.
+2. CLAUDE.md 파일은 `.claude/ai-prompt/` 내의 다른 마크다운 파일들을 참조합니다.
 3. 예시: convention.md 파일은 코드 작성 시 따라야 할 컨벤션을 정의합니다.
 
 ## 파일 설명
@@ -90,10 +101,15 @@ chmod +x apply-prompts.sh
 
 ### 글로벌 vs 프로젝트별 설정
 
-- **글로벌 설정** (`~/.claude/`): 모든 프로젝트에서 사용 가능한 기본 프롬프트
-- **프로젝트 설정** (`.claude/`): 특정 프로젝트에만 적용되는 프롬프트
-- **로컬 커스터마이징** (`CLAUDE.local.md`): `-l` 옵션으로 CLAUDE.md를 프로젝트별로 커스터마이징
-  - Git에서 제외되어 프로젝트별 고유 설정 가능
+- **글로벌 설정**: 
+  - `~/CLAUDE.md`: 홈 디렉토리의 전역 프롬프트
+  - `~/.claude/ai-prompt/`: 전역 보조 파일들
+- **프로젝트 설정**: 
+  - `프로젝트/CLAUDE.md`: 프로젝트별 프롬프트
+  - `프로젝트/.claude/ai-prompt/`: 프로젝트별 보조 파일들
+- **로컬 커스터마이징** (`CLAUDE.local.md`): `-l` 옵션으로 프로젝트별 커스터마이징
+  - Git에서 자동으로 제외됨 (.gitignore에 추가)
+  - `.claude/ai-prompt/` 디렉토리도 함께 제외
   - 원본 CLAUDE.md를 수정하지 않고 프로젝트별 조정 가능
 - 프로젝트 설정이 글로벌 설정보다 우선순위가 높습니다
 
