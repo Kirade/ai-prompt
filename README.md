@@ -39,6 +39,64 @@ ai-prompt/
 2. CLAUDE.md에 해당 파일에 대한 참조 추가
 3. 명확하고 구체적인 지침 작성
 
+## 프롬프트 적용 스크립트
+
+이 저장소는 `apply-prompts.sh` 스크립트를 제공하여 프롬프트를 쉽게 적용할 수 있습니다.
+
+### 설치
+
+```bash
+# 저장소 클론
+git clone https://github.com/Kirade/ai-prompt.git
+cd ai-prompt
+
+# 스크립트 실행 권한 부여
+chmod +x apply-prompts.sh
+```
+
+### 사용 방법
+
+```bash
+# 현재 디렉토리에 적용
+./apply-prompts.sh
+
+# 특정 프로젝트에 적용
+./apply-prompts.sh ~/my-project
+
+# 백업과 함께 적용
+./apply-prompts.sh -b ~/my-project
+
+# 심볼릭 링크로 적용 (원본 파일 참조)
+./apply-prompts.sh -s ~/my-project
+
+# 홈 디렉토리에 글로벌 적용
+./apply-prompts.sh -g
+
+# 글로벌 심볼릭 링크 적용
+./apply-prompts.sh -g -s
+
+# CLAUDE.md를 CLAUDE.local.md로 설치 (프로젝트 커스터마이징)
+./apply-prompts.sh -l
+```
+
+### 옵션
+
+- `-h, --help`: 도움말 표시
+- `-f, --force`: 기존 파일 덮어쓰기 (확인 없이)
+- `-b, --backup`: 기존 파일 백업 생성
+- `-s, --symlink`: 파일 복사 대신 심볼릭 링크 생성
+- `-g, --global`: 홈 디렉토리(~/.claude)에 글로벌 적용
+- `-l, --local`: CLAUDE.md를 CLAUDE.local.md로 설치 (프로젝트별 커스터마이징용)
+
+### 글로벌 vs 프로젝트별 설정
+
+- **글로벌 설정** (`~/.claude/`): 모든 프로젝트에서 사용 가능한 기본 프롬프트
+- **프로젝트 설정** (`.claude/`): 특정 프로젝트에만 적용되는 프롬프트
+- **로컬 커스터마이징** (`CLAUDE.local.md`): `-l` 옵션으로 CLAUDE.md를 프로젝트별로 커스터마이징
+  - Git에서 제외되어 프로젝트별 고유 설정 가능
+  - 원본 CLAUDE.md를 수정하지 않고 프로젝트별 조정 가능
+- 프로젝트 설정이 글로벌 설정보다 우선순위가 높습니다
+
 ## 라이선스
 
 이 저장소는 개인 프로젝트로 관리됩니다.
